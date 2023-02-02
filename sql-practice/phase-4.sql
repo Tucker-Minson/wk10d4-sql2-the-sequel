@@ -1,6 +1,36 @@
 PRAGMA foreign_keys=on; -- Turns foreign key support in SQLite3 on
 -- Your code here
 
+DROP TABLE IF EXISTS cat_owners;
+DROP TABLE IF EXISTS toys;
+DROP TABLE IF EXISTS cats;
+DROP TABLE IF EXISTS owners;
+
+CREATE TABLE owners (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  first_name TEXT,
+  last_name TEXT
+);
+
+CREATE TABLE cats (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT,
+  birth_year INTEGER
+);
+
+CREATE TABLE cat_owners (
+  cat_id INTEGER REFERENCES cats(id) ON DELETE CASCADE,
+  owner_id INTEGER REFERENCES owners(id) ON DELETE CASCADE
+);
+
+CREATE TABLE toys (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT,
+  cat_id INTEGER REFERENCES cats(id) ON DELETE CASCADE
+);
+
+
+
 INSERT INTO owners
   (first_name, last_name)
 VALUES
@@ -47,9 +77,26 @@ VALUES
   (3, 'Chew Toy'),
   (4, 'Tunnel'),
   (4, 'Flopping Fish'),
-  (5, 'Crinkle Ball'),
   (7, 'Cheetos'),
+  (8, 'Crinkle Ball'),
   (8, 'Yarn');
+
+
+-- Find Hermione's cats
+SELECT cats.name
+  FROM cats
+  JOIN cat_owners ON (cat_owners.cat_id = cats.id)
+  JOIN owners ON (cat_owners.owner_id = owners.id)
+WHERE owners.first_name = 'Hermione';
+
+-- Find All the Toys for Hermione's cats
+SELECT toys.name
+  FROM toys
+  JOIN cats ON (cats.id = toys.cat_id)
+  JOIN cat_owners ON (cat_owners.cat_id = cats.id)
+  JOIN owners ON (cat_owners.owner_id = owners.id)
+WHERE owners.first_name = 'Hermione';
 
 DELETE FROM cats
 WHERE cats.name = 'Smudge';
+
